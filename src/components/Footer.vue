@@ -3,7 +3,7 @@
     <div class="copyright">
       <span class="site-name">{{ siteName }}</span>
       <span class="year">{{ fullYear }}</span>
-      <span class="anthor" @click="jumpTo(copyrightLink ?? 'https://github.com/imsyy/Snavigation')">
+      <span class="anthor" @click="jumpTo(SITE_REPO)">
         {{ siteAnthor }}
       </span>
       <span v-if="icp" class="icp" @click="jumpTo('https://beian.miit.gov.cn')">
@@ -23,9 +23,16 @@
           <span class="name">{{ siteName }}</span>
           <span class="version">v {{ packageJson.version }}</span>
         </div>
+        <div class="based">
+          基于
+          <span class="link" @click="jumpTo(UPSTREAM_REPO)">
+            Snavigation
+          </span>
+          修改而来
+        </div>
         <div class="desc">
           <n-space class="link" justify="center">
-            <n-button strong secondary @click="jumpTo('https://github.com/imsyy/Snavigation')">
+            <n-button strong secondary @click="jumpTo(SITE_REPO)">
               Github
             </n-button>
           </n-space>
@@ -48,7 +55,17 @@ const icp = import.meta.env.VITE_ICP;
 const siteName = import.meta.env.VITE_SITE_TITLE;
 const siteAnthor = import.meta.env.VITE_SITE_ANTHOR;
 const copyrightLink = import.meta.env.VITE_SITE_COPYRIGHTLINK;
-const fullYear = new Date().getFullYear();
+
+// 版权年份区间
+const YEAR_START = 2024;
+const YEAR_END = 2026;
+const fullYear =
+  YEAR_START === YEAR_END ? `${YEAR_START}` : `${YEAR_START}-${YEAR_END}`;
+
+// 上游项目（本站基于其修改而来）
+const UPSTREAM_REPO = "https://github.com/imsyy/Snavigation";
+// 本站仓库（优先取 .env 配置，回退到默认地址）
+const SITE_REPO = copyrightLink || "https://github.com/Regionnor/Snavigation";
 
 // 关于弹窗数据
 const aboutSiteModal = ref(false);
@@ -131,6 +148,21 @@ const jumpTo = (url) => {
     .version {
       opacity: 0.6;
       font-size: 16px;
+    }
+  }
+  .based {
+    margin-top: 12px;
+    font-size: 13px;
+    opacity: 0.7;
+    text-align: center;
+    .link {
+      cursor: pointer;
+      text-decoration: underline;
+      opacity: 1;
+      color: var(--main-text-color);
+      &:hover {
+        opacity: 0.8;
+      }
     }
   }
   .desc {

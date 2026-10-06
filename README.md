@@ -3,6 +3,12 @@
 一个简约的起始页
 </p>
 
+> **本站项目基于 [imsyy/Snavigation](https://github.com/imsyy/Snavigation) 修改而来。**
+>
+> 感谢原作者 [imsyy](https://github.com/imsyy) 及其[青柠起始页](https://limestart.cn/) 的开源贡献。
+> 本仓库为个人站点使用的修改版本，同样遵循原项目的 GPL-3.0 许可证协议。
+> 若上游仓库更新，本仓库可能不会同步跟进。
+
 ![Snavigation.png](https://s2.loli.net/2022/07/15/FE6U2BJCynHDep8.jpg)
 
 > 重构中，尚未完成
@@ -11,8 +17,9 @@
 
 > 由于 `CDN` 缓存原因，查看最新效果可能需要 `Ctrl` + `F5` 强制刷新浏览器缓存
 
-- [Snavigation](https://nav.imsyy.top)
-- [Snavigation Dev](https://snavigation-git-dev-imsyy.vercel.app/)
+- 本站部署：[nav.393837.xyz](https://nav.393837.xyz/)
+- 上游 Demo：[Snavigation](https://nav.imsyy.top)
+- 上游 Dev：[Snavigation Dev](https://snavigation-git-dev-imsyy.vercel.app/)
 
 ### 功能
 
@@ -80,4 +87,11 @@
 
 - [青柠起始页](https://limestart.cn/)
 
-<a title="SSL" target="_blank" href="https://myssl.com/seal/detail?domain=blog.imsyy.top"><img src="https://img.shields.io/badge/MySSL-安全认证-brightgreen"></a>&nbsp;<a title="CDN" target="_blank" href="https://cdnjs.com/"><img src="https://img.shields.io/badge/CDN-Cloudflare-blue"></a>&nbsp;<a title="Copyright" target="_blank" href="https://imsyy.top/"><img src="https://img.shields.io/badge/Copyright%20%C2%A9%202020--2023-%E7%84%A1%E5%90%8D-red"></a>
+<a title="SSL" target="_blank" href="https://myssl.com/seal/detail?domain=blog.imsyy.top"><img src="https://img.shields.io/badge/MySSL-安全认证-brightgreen"></a>&nbsp;<a title="CDN" target="_blank" href="https://cdnjs.com/"><img src="https://img.shields.io/badge/CDN-Cloudflare-blue"></a>&nbsp;<a title="Copyright" target="_blank" href="https://nav.393837.xyz/"><img src="https://img.shields.io/badge/Copyright%20%C2%A9%202024--2026-%E7%84%A1%E5%90%8D-red"></a>
+
+---
+
+### 许可证
+
+本项目基于 [imsyy/Snavigation](https://github.com/imsyy/Snavigation) 修改而来，
+遵循 [GNU General Public License v3.0](./LICENSE) 许可证协议。
