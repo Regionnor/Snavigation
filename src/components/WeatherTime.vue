@@ -42,11 +42,13 @@
       <span class="day">{{ timeData.day ?? "0" }}</span>
       <span class="weekday">{{ timeData.weekday ?? "星期八" }}</span>
     </div>
-    <div v-if="set.showWeather" class="weather">
-      <span class="status">{{ weatherData?.condition ?? "N/A" }}</span>
-      <span class="temperature">{{ weatherData?.temp ?? "N/A" }} ℃</span>
-      <span class="wind">{{ weatherData?.windDir ?? "N/A" }}</span>
-      <span v-if="weatherData?.windLevel" class="wind-level"> {{ weatherData.windLevel }} 级 </span>
+    <div v-if="set.showWeather && weatherAvailable && weatherData" class="weather">
+      <span class="status">{{ weatherData.condition }}</span>
+      <span class="temperature">{{ weatherData.temp }} ℃</span>
+      <span class="wind">{{ weatherData.windDir }}</span>
+      <span v-if="weatherData.windLevel" class="wind-level">
+        {{ weatherData.windLevel }} 级
+      </span>
     </div>
   </div>
 </template>
@@ -66,6 +68,7 @@ const timeInterval = ref(null);
 
 // 天气数据
 const weatherData = ref(null);
+const weatherAvailable = ref(true);
 const weatherKey = import.meta.env.VITE_WEATHER_KEY;
 
 // 更新时间
@@ -73,10 +76,38 @@ const updateTimeData = () => {
   timeData.value = getCurrentTime(set.showZeroTime, set.use12HourFormat);
 };
 
+// 获取城市 adcode
+// 高德 /v3/ip 接口对部分个人 Key 会返回空 adcode（province/city/adcode 均为 []），
+// 此时直接查天气会得到 INVALID_PARAMS(20000)，故取不到 adcode 时回退到默认城市。
+const DEFAULT_ADCODE = "110000"; // 北京
+
+const getCityAdcode = async () => {
+  try {
+    const result = await getAdcode(weatherKey);
+    if (result.infocode !== "10000") {
+      console.warn("IP 定位失败：", result.info, "，回退到默认城市");
+      return DEFAULT_ADCODE;
+    }
+    // 高德在无法定位时可能返回空数组，需做有效性校验
+    const adcode = Array.isArray(result.adcode) ? result.adcode[0] : result.adcode;
+    if (!adcode) {
+      console.warn("IP 定位返回空 adcode（个人 Key 常见），回退到默认城市");
+      return DEFAULT_ADCODE;
+    }
+    return adcode;
+  } catch (error) {
+    console.warn("IP 定位请求异常，回退到默认城市：", error);
+    return DEFAULT_ADCODE;
+  }
+};
+
 // 获取天气数据
 const getWeatherData = async () => {
   if (!weatherKey) {
-    return $message.warning("请配置天气 Key");
+    // 未配置 Key 时静默隐藏天气区域，不打扰用户
+    console.warn("未配置天气 Key，已隐藏天气显示");
+    weatherAvailable.value = false;
+    return;
   }
   // 当前时间戳
   const currentTime = Date.now();
@@ -89,16 +120,21 @@ const getWeatherData = async () => {
   const timeDifference = currentTime - lastWeatherData.lastFetchTime;
   // 是否超出 5 分钟
   if (timeDifference >= 5 * 60 * 1000) {
-    const adCodeResult = await getAdcode(weatherKey);
-    if (adCodeResult.infocode !== "10000") {
-      return $message.error("地区查询失败");
-    }
-    // 获取天气数据
-    const weatherResult = await getWeather(weatherKey, adCodeResult.adcode);
+    const adcode = await getCityAdcode();
+    const weatherResult = await getWeather(weatherKey, adcode);
     if (weatherResult.infocode !== "10000") {
-      return $message.error("地区查询失败");
+      // 天气接口失败时静默降级，不再弹错误提示
+      console.error("天气查询失败：", weatherResult.info, weatherResult.infocode);
+      weatherAvailable.value = false;
+      return;
     }
-    const data = weatherResult.lives[0];
+    const data = weatherResult.lives?.[0];
+    if (!data) {
+      console.error("天气数据为空，已隐藏天气显示");
+      weatherAvailable.value = false;
+      return;
+    }
+    weatherAvailable.value = true;
     weatherData.value = {
       condition: data.weather,
       temp: data.temperature,
@@ -111,6 +147,7 @@ const getWeatherData = async () => {
   } else {
     console.log("从缓存中读取天气数据：", lastWeatherData);
     weatherData.value = lastWeatherData.data;
+    weatherAvailable.value = Boolean(lastWeatherData.data);
   }
 };
 
