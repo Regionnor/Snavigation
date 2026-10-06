@@ -24,7 +24,11 @@ const set = setStore();
 const status = statusStore();
 const bgUrl = ref(null);
 const imgTimeout = ref(null);
+const watchdogTimer = ref(null);
 const emit = defineEmits(["loadComplete"]);
+
+// 壁纸加载兜底超时时间（毫秒）
+const LOAD_TIMEOUT = 5000;
 
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
@@ -67,6 +71,18 @@ const imgLoadComplete = () => {
   );
 };
 
+// 兜底：无论壁纸是否加载成功，超过指定时间都允许进入主页，
+//避免第三方壁纸接口失效时页面一直卡在加载占位页
+const startLoadWatchdog = () => {
+  watchdogTimer.value = setTimeout(() => {
+    if (!status.imgLoadStatus) {
+      console.warn("壁纸加载超时，已跳过加载占位页");
+      status.setImgLoadStatus(true);
+    }
+    emit("loadComplete");
+  }, LOAD_TIMEOUT);
+};
+
 // 图片动画完成
 const imgAnimationEnd = () => {
   console.log("壁纸加载且动画完成");
@@ -83,10 +99,12 @@ const imgLoadError = () => {
 
 onMounted(() => {
   setBgUrl();
+  startLoadWatchdog();
 });
 
 onBeforeUnmount(() => {
   clearTimeout(imgTimeout.value);
+  clearTimeout(watchdogTimer.value);
 });
 </script>
 
