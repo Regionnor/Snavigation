@@ -7,7 +7,9 @@ const useSetDataStore = defineStore("setData", {
       themeType: "light",
       // 壁纸类别
       // 0 本地 / 1 必应 / 2 随机风景 / 3 随机动漫 / 4 自定义
-      backgroundType: 2,
+      // 注意：1/2/3 依赖第三方每日壁纸接口，接口失效会导致壁纸加载不出来，
+      // 因此默认值使用 0（本地壁纸，随包发布，稳定可用）
+      backgroundType: 0,
       backgroundCustom: "",
       // 壁纸遮罩
       showBackgroundGray: true,
